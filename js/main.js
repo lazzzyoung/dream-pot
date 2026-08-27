@@ -6,6 +6,11 @@
 
 import { renderBlueprint, applyOwnership } from './ui/blueprint.js';
 import { getPartSet, totalUnits } from './parts.js';
+import * as store from './store.js';
+import * as partsApi from './parts.js';
+
+// Step 2 is verified from the console, not the UI.
+window.__shop = { store, parts: partsApi };
 
 const set = getPartSet('model3');
 const svg = renderBlueprint(document.getElementById('board'), set.id);
