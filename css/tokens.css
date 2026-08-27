@@ -1,0 +1,89 @@
+/* ============================================================
+   tokens.css — design tokens only. No layout, no components.
+   Two worlds: BLUEPRINT (not yet owned) and REAL (owned).
+   ============================================================ */
+
+:root {
+  /* ---------- ink surfaces (dark, teal-inked, never pure black) ---------- */
+  --ink-950: #060d10;
+  --ink-900: #0a1418;   /* page ground */
+  --ink-850: #0d1a1f;   /* drawing board */
+  --ink-800: #11242a;
+  --ink-700: #162c33;   /* panels */
+  --ink-600: #1e3b44;   /* raised panels */
+  --ink-500: #2a5058;   /* hairlines */
+
+  /* ---------- blueprint (low-chroma cyan, thin) ---------- */
+  --bp-line:      #74aab2;  /* primary drafting line */
+  --bp-line-soft: #4b7c85;  /* secondary / construction */
+  --bp-grid:      #17343c;  /* background grid */
+  --bp-text:      #8fbcc2;  /* part labels */
+  --bp-dim:       #5d9099;  /* dimension figures */
+  --bp-frame:     #2d5a63;  /* sheet frame, title block */
+
+  /* ---------- real materials (warm; deliberately off the blueprint axis) --- */
+  --real-body:    #a9927c;  /* painted shell */
+  --real-panel:   #9e8570;  /* door skin */
+  --real-panel-2: #b39c86;  /* hood / trunk lid */
+  --real-metal:   #8d847a;  /* chassis, motor, rim */
+  --real-metal-d: #6b625a;  /* shadowed metal */
+  --real-rubber:  #26221f;  /* tire */
+  --real-dark:    #3a332d;  /* interior trim */
+  --real-glass:   #52757d;  /* glazing */
+  --real-lamp:    #f0dcae;  /* lit lens */
+  --real-edge:    #4a3f35;  /* edge line on real parts */
+  --real-edge-lt: #7d6c5b;  /* edge line on light real parts */
+
+  /* ---------- the one accent: coins ---------- */
+  --coin:         #f2c14e;
+  --coin-dim:     #8a6f2c;
+  --coin-glow:    #f2c14e33;
+
+  /* ---------- text ---------- */
+  --fg:        #dfeaec;
+  --fg-muted:  #9db3b7;
+  --fg-faint:  #6b8388;
+
+  /* ---------- state ---------- */
+  --locked:    #4a5a5e;
+  --danger:    #d1725c;
+
+  /* ---------- type ---------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+               "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+               "Roboto Mono", monospace;
+
+  --ls-draft: 0.18em;   /* drafting labels */
+  --ls-tight: -0.01em;
+
+  --fs-draft: 0.6875rem;  /* 11px — part names, dimensions */
+  --fs-sm:    0.8125rem;
+  --fs-base:  0.9375rem;
+  --fs-lg:    1.125rem;
+  --fs-num:   1.75rem;
+  --fs-num-lg: 2.5rem;
+
+  /* ---------- space ---------- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  --r-sm: 3px;
+  --r-md: 6px;
+  --r-lg: 10px;
+
+  /* ---------- motion ---------- */
+  --t-fast:  120ms;
+  --t-base:  220ms;
+  --t-slow:  420ms;
+  --ease:    cubic-bezier(.32, .72, .28, 1);
+  --ease-out: cubic-bezier(.16, .84, .44, 1);
+
+  /* ---------- focus ---------- */
+  --focus: var(--coin);
+}

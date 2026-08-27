@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>부품상</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/motion.css">
+</head>
+<body>
+  <main class="app">
+    <div class="board">
+      <div class="board__svg" id="board"></div>
+      <div class="board__meta">
+        <div class="board__pct num" id="pct">0<sup>%</sup></div>
+        <div class="board__count" id="count">0 / 28</div>
+      </div>
+    </div>
+
+    <!-- TEMPORARY: step-1 preview only. Deleted when the shop lands. -->
+    <section class="probe">
+      <div class="probe__head">
+        <span class="draft-label">부품 상태 미리보기</span>
+        <span class="probe__note">눌러서 도면이 실물로 바뀌는 걸 확인하세요</span>
+      </div>
+      <div class="probe__grid" id="probe"></div>
+      <div class="probe__actions">
+        <button class="btn" id="all">전부 채우기</button>
+        <button class="btn" id="none">전부 비우기</button>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

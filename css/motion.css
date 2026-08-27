@@ -1,0 +1,21 @@
+/* ============================================================
+   motion.css — the buy sequence lives here. Everything else stays still.
+   ============================================================ */
+
+/* Blueprint -> real is a transition, not a jump, even outside the sequence. */
+.bp .unit,
+.bp .unit * {
+  transition: opacity var(--t-base) var(--ease),
+              fill var(--t-base) var(--ease),
+              stroke var(--t-base) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bp .unit, .bp .unit * { transition: none; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,202 @@
+/* ============================================================
+   app.css — layout and components.
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--ink-900);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.55;
+  letter-spacing: var(--ls-tight);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* numbers never reflow */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* drafting label voice */
+.draft-label {
+  font-size: var(--fs-draft);
+  letter-spacing: var(--ls-draft);
+  text-transform: uppercase;
+  color: var(--bp-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+.app { max-width: 900px; margin: 0 auto; padding: var(--sp-4); }
+
+/* ------------------------------------------------------------
+   Drawing board — the blueprint sits on its own sheet
+   ------------------------------------------------------------ */
+.board {
+  position: relative;
+  background: var(--ink-850);
+  border: 1px solid var(--ink-600);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.board__svg { display: block; }
+.board__svg svg { display: block; width: 100%; height: auto; }
+
+.board__meta {
+  position: absolute;
+  top: var(--sp-3);
+  right: var(--sp-4);
+  text-align: right;
+  pointer-events: none;
+}
+
+.board__pct {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-num);
+  line-height: 1;
+  color: var(--fg);
+}
+.board__pct sup { font-size: 0.5em; color: var(--fg-faint); top: -0.9em; }
+
+.board__count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-draft);
+  letter-spacing: 0.08em;
+  color: var(--bp-dim);
+  margin-top: var(--sp-1);
+}
+
+/* ------------------------------------------------------------
+   TEMPORARY — step 1 preview panel. Removed once the shop exists.
+   ------------------------------------------------------------ */
+.probe {
+  margin-top: var(--sp-5);
+  padding: var(--sp-4);
+  border: 1px dashed var(--ink-600);
+  border-radius: var(--r-lg);
+}
+.probe__head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--sp-3); margin-bottom: var(--sp-4); flex-wrap: wrap;
+}
+.probe__note { font-size: var(--fs-sm); color: var(--fg-faint); }
+.probe__grid {
+  display: grid; gap: var(--sp-2);
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+}
+.probe__row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--ink-800);
+  border: 1px solid var(--ink-600);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  color: var(--fg-muted);
+  text-align: left;
+  font-family: var(--font-sans);
+  transition: border-color var(--t-fast) var(--ease),
+              color var(--t-fast) var(--ease);
+}
+.probe__row[aria-pressed="true"] {
+  border-color: var(--real-edge-lt);
+  color: var(--fg);
+  background: #1a1b18;
+}
+.probe__row .num { color: var(--bp-dim); font-size: var(--fs-draft); }
+.probe__row[aria-pressed="true"] .num { color: var(--real-panel-2); }
+
+.probe__actions { display: flex; gap: var(--sp-2); margin-top: var(--sp-4); }
+
+.btn {
+  font-family: var(--font-sans);
+  font-size: var(--fs-sm);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--ink-500);
+  background: var(--ink-700);
+  color: var(--fg);
+  cursor: pointer;
+}
+.btn:hover { border-color: var(--bp-line-soft); }
+
+@media (max-width: 480px) {
+  .app { padding: var(--sp-3); }
+  .board__pct { font-size: 1.375rem; }
+  .board__meta { top: var(--sp-2); right: var(--sp-3); }
+}
+
+/* ============================================================
+   The drawing itself — blueprint vs. real
+   ============================================================ */
+
+/* ---- sheet furniture ---- */
+.bp-grid      { fill: none; stroke: var(--bp-grid); stroke-width: 0.5; }
+.bp-grid-dot  { fill: var(--bp-grid); }
+.bp-frame     { fill: none; stroke: var(--bp-frame); stroke-width: 1; }
+.bp-tb-main {
+  fill: var(--bp-text); font-family: var(--font-sans);
+  font-size: 11px; letter-spacing: var(--ls-draft);
+}
+.bp-tb-sub {
+  fill: var(--bp-dim); font-family: var(--font-sans);
+  font-size: 9px; letter-spacing: 0.14em;
+}
+
+/* ---- dimensions ---- */
+.bp-ground {
+  fill: none; stroke: var(--bp-line-soft); stroke-width: 1;
+  stroke-dasharray: 14 5 2 5; opacity: 0.7;
+}
+.bp-ext     { fill: none; stroke: var(--bp-frame); stroke-width: 0.6; }
+.bp-dimline { fill: none; stroke: var(--bp-dim); stroke-width: 0.7; }
+.bp-tick    { fill: none; stroke: var(--bp-dim); stroke-width: 1; }
+.bp-dimtext {
+  fill: var(--bp-dim); font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.1em;
+}
+
+/* ---- default state: everything is a drawing ---- */
+.bp .unit {
+  fill: none;
+  stroke: var(--bp-line);
+  stroke-width: 1;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.5;
+}
+.bp .unit * { fill: none; vector-effect: non-scaling-stroke; }
+
+/* construction lines read fainter than outlines */
+.bp .unit .mat-none { stroke: var(--bp-line-soft); stroke-width: 0.7; }
+
+/* ---- owned: the part becomes a thing ---- */
+.bp .unit.is-owned {
+  opacity: 1;
+  stroke: var(--real-edge);
+  stroke-width: 1;
+}
+.bp .unit.is-owned .mat-body    { fill: var(--real-body);    stroke: var(--real-edge-lt); }
+.bp .unit.is-owned .mat-panel   { fill: var(--real-panel);   stroke: var(--real-edge-lt); }
+.bp .unit.is-owned .mat-panel-2 { fill: var(--real-panel-2); stroke: var(--real-edge-lt); }
+.bp .unit.is-owned .mat-metal   { fill: var(--real-metal);   stroke: var(--real-edge); }
+.bp .unit.is-owned .mat-metal-d { fill: var(--real-metal-d); stroke: var(--real-edge); }
+.bp .unit.is-owned .mat-rubber  { fill: var(--real-rubber);  stroke: #0e0c0b; }
+.bp .unit.is-owned .mat-dark    { fill: var(--real-dark);    stroke: var(--real-edge); }
+.bp .unit.is-owned .mat-lamp    { fill: var(--real-lamp);    stroke: #8a7746; }
+.bp .unit.is-owned .mat-glass   { fill: var(--real-glass);   stroke: #7a9aa0; fill-opacity: 0.72; }
+.bp .unit.is-owned .mat-none    { stroke: var(--real-edge); stroke-width: 0.8; opacity: 0.75; }
+
+/* the whole car, finished */
+.bp.is-finished .bp-parts { filter: drop-shadow(0 0 22px rgba(240, 220, 174, 0.14)); }
