@@ -6,8 +6,23 @@
  */
 
 import { MODEL3_SVG } from '../../svg/model3.js';
+import { getPaint } from '../parts.js';
 
 const SETS = { model3: MODEL3_SVG };
+
+/**
+ * Push the chosen body colour into the material variables. Set on :root so the
+ * drawing, the card icons and the purchase sheet all repaint together.
+ * Only the painted panels change — metal, rubber and interior stay warm.
+ */
+export function applyPaint(paintId) {
+  const p = getPaint(paintId);
+  const r = document.documentElement.style;
+  r.setProperty('--real-body', p.body);
+  r.setProperty('--real-panel', p.panel);
+  r.setProperty('--real-panel-2', p.panel2);
+  r.setProperty('--real-edge-lt', p.edgeLt);
+}
 
 /** Draw the blueprint into `mount`. Returns the <svg> element. */
 export function renderBlueprint(mount, partSetId = 'model3') {

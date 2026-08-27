@@ -13,7 +13,7 @@ import {
 } from './parts.js';
 
 const KEY = 'parts-shop:v1';
-const VERSION = 2;
+const VERSION = 3;
 
 const emptyState = () => ({
   version: VERSION,
@@ -35,13 +35,20 @@ function migrate(raw) {
   s.deposits = Array.isArray(raw.deposits) ? raw.deposits.slice() : [];
   s.coins = Number(raw.coins) || 0;
 
+  const was = Number(raw.version) || 1;
+
   // v1 -> v2: saving split into an auto lane and an extra lane.
   // Everything recorded under v1 was a scheduled monthly deposit.
-  if ((Number(raw.version) || 1) < 2) {
+  if (was < 2) {
     s.deposits = s.deposits.map((d) => ({ ...d, kind: d.kind || 'auto' }));
     if (s.goal && !s.goal.payday) {
       s.goal = { ...s.goal, payday: parseDate(s.goal.startDate).getDate() };
     }
+  }
+
+  // v2 -> v3: the car has a colour now.
+  if (was < 3 && s.goal && !s.goal.paintColor) {
+    s.goal = { ...s.goal, paintColor: 'pearl' };
   }
   return s;
 }
@@ -92,7 +99,7 @@ function commit(next, event) {
 
 /** Register the one goal. Replaces any previous run entirely. */
 export function createGoal({ id, name, totalPrice, partSetId = 'model3',
-                             monthlyDeposit, payday, startDate }) {
+                             monthlyDeposit, payday, startDate, paintColor = 'pearl' }) {
   const start = startDate || todayISO();
   const goal = {
     id,
@@ -101,6 +108,7 @@ export function createGoal({ id, name, totalPrice, partSetId = 'model3',
     partSetId,
     monthlyDeposit: Math.round(Number(monthlyDeposit)),  // the auto lane
     payday: Math.min(31, Math.max(1, Math.round(Number(payday)) || parseDate(start).getDate())),
+    paintColor,
     startDate: start,
     createdAt: new Date().toISOString(),
   };
@@ -161,6 +169,14 @@ export function addExtra(amountWon, now = new Date()) {
   }, { type: 'deposit:added', entries: [entry], coins: entry.coins, lane: 'extra' });
 
   return { ok: true, entry, coins: entry.coins };
+}
+
+/** Repaint. Free, and changeable whenever — it is a plan, not a purchase. */
+export function setPaint(paintColor) {
+  if (!state.goal) return { ok: false, reason: 'no_goal' };
+  commit({ ...state, goal: { ...state.goal, paintColor } },
+         { type: 'paint:changed', paintColor });
+  return { ok: true };
 }
 
 /** Change the standing plan — a raise, a new payday, a tighter month. */

@@ -6,7 +6,8 @@
 
 import {
   formatWon, formatCoin, wonToCoin, monthsToComplete, formatMonths,
-  completionDate, todayISO, parseDate, affordableCount, cheapestPart, nthPayday, formatDate,
+  completionDate, todayISO, parseDate, affordableCount, cheapestPart, nthPayday,
+  PAINTS, getPaint,
 } from '../parts.js';
 import { createGoal } from '../store.js';
 import { MODEL3_SVG } from '../../svg/model3.js';
@@ -33,6 +34,7 @@ export function openConfirm(item) {
     monthly: DEFAULT_MONTHLY,
     start: todayISO(),
     payday: parseDate(todayISO()).getDate(),
+    paint: 'pearl',
     setId: item.partSetId || 'model3',
   };
 
@@ -74,6 +76,18 @@ export function openConfirm(item) {
           <div class="field field--num">
             <input id="f-payday" type="text" inputmode="numeric">
             <span class="field__unit">일</span>
+          </div>
+        </div>
+        <div>
+          <div class="row__head">
+            <span class="stamp">색상</span>
+            <span class="row__sub" id="v-paint">${getPaint('pearl').name}</span>
+          </div>
+          <div class="paints__row">
+            ${PAINTS.map((p) => `
+              <button class="swatch" type="button" data-pick-paint="${p.id}"
+                      style="--sw:${p.body}" title="${p.name}" aria-label="${p.name}"
+                      aria-pressed="${p.id === 'pearl'}"></button>`).join('')}
           </div>
         </div>
       </div>
@@ -119,7 +133,7 @@ export function openConfirm(item) {
     const firstCoins = wonToCoin(state.monthly);
     const kinds = affordableCount(state.setId, state.price, firstCoins);
     const cheapest = cheapestPart(state.setId, state.price);
-    const head = `첫 인증에 <b>${formatCoin(firstCoins)}코인</b> — `;
+    const head = `첫 월급날에 <b>${formatCoin(firstCoins)}코인</b> — `;
     if (kinds > 1) {
       $('#v-first').innerHTML = head + `부품 <b>${kinds}종</b> 중에서 골라 삽니다`;
     } else if (kinds === 1) {
@@ -138,6 +152,15 @@ export function openConfirm(item) {
     el.value = n ? formatWon(n) : '';
     sync();
   }));
+  root.addEventListener('click', (e) => {
+    const sw = e.target.closest('[data-pick-paint]');
+    if (!sw) return;
+    state.paint = sw.dataset.pickPaint;
+    root.querySelectorAll('[data-pick-paint]').forEach((b) =>
+      b.setAttribute('aria-pressed', String(b.dataset.pickPaint === state.paint)));
+    $('#v-paint').textContent = getPaint(state.paint).name;
+  });
+
   payday.addEventListener('input', () => {
     payday.value = payday.value.replace(/[^\d]/g, '').slice(0, 2);
     sync();
@@ -148,7 +171,7 @@ export function openConfirm(item) {
     createGoal({
       id: item.id, name: item.name, totalPrice: state.price,
       partSetId: state.setId, monthlyDeposit: state.monthly,
-      payday: state.payday, startDate: state.start,
+      payday: state.payday, startDate: state.start, paintColor: state.paint,
     });
     closeConfirm();
     onDone();

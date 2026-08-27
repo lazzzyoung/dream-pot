@@ -92,8 +92,9 @@ function card(p, setId, coins) {
 
   return `
     <button class="card" type="button" data-buy="${p.id}" data-state="${p.state}"
-            ${p.state === BUY.OK ? '' : 'disabled'}
-            aria-label="${p.name} ${p.unitCoin}코인, ${p.have}/${p.count} 보유">
+            ${p.state === BUY.SOLD_OUT ? 'disabled' : ''}
+            aria-label="${p.name} ${p.unitCoin}코인, ${p.have}/${p.count} 보유${
+        p.state === BUY.NO_COINS ? `, ${short}코인 모자람` : ''}">
       <span class="card__icon">${partIcon(setId, p.id, real)}</span>
       <span class="card__qty num" data-full="${p.have >= p.count}">${p.have}/${p.count}</span>
       <span class="card__name">${p.name}</span>

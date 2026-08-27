@@ -360,6 +360,43 @@ button, input, select { font: inherit; color: inherit; }
 }
 
 
+/* ---- paint chips, hung under the drawing like a colour card ---- */
+.paints {
+  display: flex; align-items: center; gap: var(--sp-3);
+  flex-wrap: wrap;
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: linear-gradient(180deg, var(--plate-hi), var(--plate-lo));
+  border-radius: var(--r-lg);
+  box-shadow: var(--lift-1);
+}
+.paints__row { display: flex; gap: var(--sp-2); }
+.paints__name { font-size: var(--fs-sm); color: var(--fg-muted); }
+.paints__note { margin-left: auto; font-size: var(--fs-draft); color: var(--fg-faint); }
+
+.swatch {
+  width: 26px; height: 26px; padding: 0; cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--sw);
+  box-shadow: 0 1px 0 rgba(255,255,255,.2) inset, 0 2px 5px rgba(0,0,0,.5);
+}
+.swatch:hover { transform: translateY(-1px); }
+.swatch[aria-pressed="true"] {
+  border-color: var(--coin);
+  box-shadow: 0 1px 0 rgba(255,255,255,.2) inset, 0 0 0 2px var(--ink-900),
+              0 0 0 4px var(--coin), 0 2px 6px rgba(0,0,0,.5);
+}
+
+/* ---- "coins short" sheet ---- */
+.short__head {
+  display: flex; align-items: baseline; gap: var(--sp-3);
+  margin: 0 0 var(--sp-2);
+  font-size: var(--fs-num); font-weight: 700;
+}
+.short__hint { margin: var(--sp-3) 0 0; font-size: var(--fs-sm); color: var(--fg-muted); }
+.short__hint b { color: var(--coin); }
+
 /* ------------------------------------------------------------
    counter row — coins and the certification card
    ------------------------------------------------------------ */

@@ -17,19 +17,54 @@ export const PART_SETS = {
       { id: 'battery',    name: '배터리팩',                 count: 1, weight: 24 },
       { id: 'motor',      name: '구동 모터',                count: 1, weight: 9  },
       { id: 'paint',      name: '도색 · 마감',              count: 1, weight: 12 },
-      { id: 'door',       name: '도어',                     count: 4, weight: 8  },
-      { id: 'wheel',      name: '휠 · 타이어',              count: 4, weight: 6  },
-      { id: 'suspension', name: '서스펜션',                 count: 4, weight: 6  },
-      { id: 'seat',       name: '시트',                     count: 5, weight: 6  },
+      { id: 'door',       name: '도어',                     count: 4, weight: 8,
+        units: ['앞문', '뒷문', '반대편 앞문', '반대편 뒷문'] },
+      { id: 'wheel',      name: '휠 · 타이어',              count: 4, weight: 6,
+        units: ['앞바퀴', '뒷바퀴', '반대편 앞바퀴', '반대편 뒷바퀴'] },
+      { id: 'suspension', name: '서스펜션',                 count: 4, weight: 6,
+        units: ['앞 서스펜션', '뒤 서스펜션', '반대편 앞 서스펜션', '반대편 뒤 서스펜션'] },
+      { id: 'seat',       name: '시트',                     count: 5, weight: 6,
+        units: ['운전석 시트', '뒷좌석 시트', '조수석 시트', '반대편 뒷좌석 시트', '가운데 뒷좌석 시트'] },
       { id: 'sensor',     name: '오토파일럿 센서',          count: 1, weight: 4  },
-      { id: 'hood',       name: '후드 · 트렁크',            count: 2, weight: 4  },
+      { id: 'hood',       name: '후드 · 트렁크',            count: 2, weight: 4,
+        units: ['후드', '트렁크 리드'] },
       { id: 'glass',      name: '윈드실드 · 사이드 글라스', count: 1, weight: 3  },
-      { id: 'lamp',       name: '헤드램프 · 테일램프',      count: 2, weight: 3  },
+      { id: 'lamp',       name: '헤드램프 · 테일램프',      count: 2, weight: 3,
+        units: ['헤드램프', '테일램프'] },
       { id: 'dash',       name: '대시보드 · 스티어링',      count: 1, weight: 3  },
       { id: 'display',    name: '센터 디스플레이',          count: 1, weight: 2  },
     ],
   },
 };
+
+/* ============================================================
+   paint — the one thing about the car the owner actually chooses.
+   Picked at registration, applied the moment 도색 · 마감 is bought.
+   Descriptive colour names; the other materials stay warm so the
+   blueprint/real contrast survives even under a cool body colour.
+   ============================================================ */
+
+export const PAINTS = [
+  { id: 'pearl',  name: '펄 화이트',      body: '#dcd8d0', panel: '#cfcac1', panel2: '#e6e2db', edgeLt: '#7d766c' },
+  { id: 'black',  name: '솔리드 블랙',    body: '#2b2d2f', panel: '#242628', panel2: '#35383b', edgeLt: '#5f6467' },
+  { id: 'silver', name: '미드나이트 실버', body: '#9a9791', panel: '#8e8b85', panel2: '#a8a5a0', edgeLt: '#55524e' },
+  { id: 'blue',   name: '딥 블루',        body: '#294769', panel: '#23405f', panel2: '#325378', edgeLt: '#5e81a6' },
+  { id: 'red',    name: '레드',           body: '#9c2a2a', panel: '#8b2424', panel2: '#ae3636', edgeLt: '#cf6b6b' },
+];
+
+export const getPaint = (id) => PAINTS.find((p) => p.id === id) || PAINTS[0];
+
+/** What to call one unit of a part. Falls back to the part's own name. */
+export function unitLabel(part, index) {
+  return (part.units && part.units[index]) || part.name;
+}
+
+/** 을/를. Korean UI deserves the right particle. */
+export function objectParticle(word) {
+  const code = String(word).charCodeAt(String(word).length - 1);
+  if (code < 0xAC00 || code > 0xD7A3) return '를';
+  return (code - 0xAC00) % 28 ? '을' : '를';
+}
 
 export function getPartSet(id) {
   return PART_SETS[id] || PART_SETS.model3;
