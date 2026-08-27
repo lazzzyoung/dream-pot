@@ -28,8 +28,6 @@ export const PART_SETS = {
       { id: 'dash',       name: '대시보드 · 스티어링',      count: 1, weight: 3  },
       { id: 'display',    name: '센터 디스플레이',          count: 1, weight: 2  },
     ],
-    // chassis first: nothing else can be bolted on until there is a frame.
-    requiresFirst: 'chassis',
   },
 };
 
@@ -76,7 +74,6 @@ export function formatManWon(won) {
 
 export const BUY = {
   OK: 'ok',
-  LOCKED: 'locked',       // chassis not owned yet
   SOLD_OUT: 'sold_out',   // every unit already owned
   NO_COINS: 'no_coins',
 };
@@ -84,6 +81,8 @@ export const BUY = {
 /**
  * Why can (or can't) this part be bought right now?
  * Pure: takes the numbers, returns a reason code.
+ * There is no forced first purchase — the shop is open from day one and the
+ * customer picks whatever they can afford.
  */
 export function buyState(setId, partId, owned, coins, totalPrice) {
   const set = getPartSet(setId);
@@ -93,9 +92,6 @@ export function buyState(setId, partId, owned, coins, totalPrice) {
   const have = ownedOf(owned, partId);
   if (have >= part.count) return BUY.SOLD_OUT;
 
-  const gate = set.requiresFirst;
-  if (gate && partId !== gate && ownedOf(owned, gate) < 1) return BUY.LOCKED;
-
   if (coins < wonToCoin(unitPriceWon(totalPrice, part))) return BUY.NO_COINS;
   return BUY.OK;
 }
@@ -104,14 +100,25 @@ export const ownedOf = (owned, partId) => Number(owned?.[partId]) || 0;
 
 /**
  * Shop order (PRD 6.5): buyable first, then cheapest first.
- * Sold-out parts sink to the bottom; locked parts sit above them.
+ * Sold-out parts sink to the bottom.
  */
 export function shopOrder(setId, totalPrice, owned, coins) {
-  const rank = { [BUY.OK]: 0, [BUY.NO_COINS]: 1, [BUY.LOCKED]: 2, [BUY.SOLD_OUT]: 3 };
+  const rank = { [BUY.OK]: 0, [BUY.NO_COINS]: 1, [BUY.SOLD_OUT]: 2 };
   return pricedParts(setId, totalPrice)
     .map((p) => ({ ...p, state: buyState(setId, p.id, owned, coins, totalPrice),
                    have: ownedOf(owned, p.id) }))
     .sort((a, b) => (rank[a.state] - rank[b.state]) || (a.unitCoin - b.unitCoin));
+}
+
+/** How many distinct parts a given coin balance could buy from scratch. */
+export function affordableCount(setId, totalPrice, coins) {
+  return pricedParts(setId, totalPrice).filter((p) => p.unitCoin <= coins).length;
+}
+
+/** The cheapest part in the set — what the first purchase will realistically be. */
+export function cheapestPart(setId, totalPrice) {
+  return pricedParts(setId, totalPrice)
+    .reduce((a, b) => (b.unitCoin < a.unitCoin ? b : a));
 }
 
 /** Owned units / total units, and the percentage the drawing represents. */

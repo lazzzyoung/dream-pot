@@ -4,6 +4,8 @@
    ============================================================ */
 
 :root {
+  color-scheme: dark;
+
   /* ---------- ink surfaces (dark, teal-inked, never pure black) ---------- */
   --ink-950: #060d10;
   --ink-900: #0a1418;   /* page ground */
@@ -43,6 +45,18 @@
   --fg:        #dfeaec;
   --fg-muted:  #9db3b7;
   --fg-faint:  #6b8388;
+
+  /* ---------- the shop: metal plate, bevels, rivets ---------- */
+  --plate-hi:  #1d343b;   /* plate face, lit edge */
+  --plate-lo:  #12232a;   /* plate face, shadowed edge */
+  --bevel-up:  #33606c;   /* 1px catch-light along a top edge */
+  --bevel-dn:  #050d10;   /* the drop under a raised thing */
+  --rivet:     #2f545e;
+  --slot:      #0a1519;   /* recessed well: inputs, shelves */
+
+  --lift-1: 0 1px 0 var(--bevel-up) inset, 0 2px 0 var(--bevel-dn), 0 6px 14px rgba(0,0,0,.42);
+  --lift-2: 0 1px 0 var(--bevel-up) inset, 0 3px 0 var(--bevel-dn), 0 14px 28px rgba(0,0,0,.5);
+  --sunk:   0 2px 6px rgba(0,0,0,.55) inset, 0 1px 0 var(--bevel-up);
 
   /* ---------- state ---------- */
   --locked:    #4a5a5e;

@@ -50,6 +50,10 @@ function suspension(cx) {
       <path class="mat-metal-d" d="M ${cx - 38} 246 L ${cx} 237 L ${cx + 38} 246 L ${cx + 36} 251 L ${cx} 243 L ${cx - 36} 251 Z"/>`;
 }
 
+/** The bare silhouette. Also used as a thumbnail on catalog cards. */
+export const MODEL3_OUTLINE =
+  'M 68 258 L 119 258 A 62 62 0 0 1 241 258 L 565 258 A 62 62 0 0 1 687 258 L 750 258 C 762 257 768 250 768 240 L 768 172 C 767 160 764 152 758 146 L 706 132 C 656 116 600 94 542 82 C 508 76 470 73 440 74 C 410 75 380 80 352 90 L 246 138 C 192 152 128 166 84 178 C 64 183 48 192 46 208 L 46 238 C 46 250 56 258 68 258 Z';
+
 /* --- shared outlines: the paint shell cuts these out, the panels fill them --- */
 const D_HOOD  = 'M 84 178 C 128 166 192 152 246 138 L 250 156 C 196 170 134 184 90 196 Z';
 const D_TRUNK = 'M 706 132 L 758 146 C 764 152 767 160 768 172 L 748 174 C 746 163 743 157 738 153 L 696 143 Z';
@@ -172,12 +176,7 @@ export const MODEL3_SVG = `
     <g class="part" data-part="paint" data-count="1">
       <g class="unit" data-index="0">
         <path class="mat-body" fill-rule="evenodd" d="
-          M 68 258 L 119 258 A 62 62 0 0 1 241 258 L 565 258 A 62 62 0 0 1 687 258
-          L 750 258 C 762 257 768 250 768 240 L 768 172
-          C 767 160 764 152 758 146 L 706 132
-          C 656 116 600 94 542 82 C 508 76 470 73 440 74 C 410 75 380 80 352 90
-          L 246 138 C 192 152 128 166 84 178 C 64 183 48 192 46 208
-          L 46 238 C 46 250 56 258 68 258 Z
+          ${MODEL3_OUTLINE}
           ${D_GLASSHOUSE}
           ${D_HOOD}
           ${D_DOOR_F}

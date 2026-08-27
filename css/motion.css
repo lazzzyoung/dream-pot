@@ -19,3 +19,16 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ---- confirm sheet slides up from the counter ---- */
+.scrim .sheet {
+  transform: translateY(14px);
+  opacity: 0;
+  transition: transform var(--t-slow) var(--ease-out),
+              opacity var(--t-base) var(--ease);
+}
+.scrim .sheet.is-in { transform: none; opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scrim .sheet { transform: none; opacity: 1; transition: none; }
+}
