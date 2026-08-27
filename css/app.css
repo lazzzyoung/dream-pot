@@ -359,13 +359,163 @@ button, input, select { font: inherit; color: inherit; }
   color: var(--bp-dim); margin-top: var(--sp-1);
 }
 
+
 /* ------------------------------------------------------------
-   TEMPORARY — placeholder main screen until step 4 lands
+   counter row — coins and the certification card
    ------------------------------------------------------------ */
-.stub { margin-top: var(--sp-5); display: grid; gap: var(--sp-3); }
-.stub__rows { display: grid; gap: var(--sp-2); font-size: var(--fs-sm); }
-.stub__row { display: flex; justify-content: space-between; gap: var(--sp-4); }
-.stub__row span:last-child { color: var(--fg-muted); }
+.counterrow {
+  display: grid; gap: var(--sp-3);
+  margin-top: var(--sp-4);
+  grid-template-columns: minmax(0, 250px) minmax(0, 1fr);
+}
+
+.counter { display: flex; flex-direction: column; justify-content: center; }
+.counter__val {
+  display: flex; align-items: center;
+  font-size: var(--fs-num-lg); line-height: 1.05;
+  margin-top: var(--sp-2);
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.counter__val .coin { width: .62em; height: .7em; margin-right: .22em; }
+.counter__won { color: var(--fg-muted); font-size: var(--fs-sm); }
+.counter__rate {
+  margin-top: auto; padding-top: var(--sp-3);
+  font-size: var(--fs-draft); color: var(--fg-faint); letter-spacing: .06em;
+}
+
+.deposit__ask  { margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-lg); }
+.deposit__ask b { font-weight: 700; }
+.deposit__wait { margin: var(--sp-2) 0 2px; font-size: var(--fs-lg); }
+.deposit__wait b { color: var(--coin); font-weight: 700; }
+.deposit__sub  { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); color: var(--fg-muted); }
+.deposit .field { margin-bottom: var(--sp-3); }
+.deposit .key--wide { margin-top: 0; }
+
+.log { margin-top: var(--sp-3); }
+.log summary {
+  cursor: pointer; list-style: none;
+  font-size: var(--fs-draft); letter-spacing: .08em; color: var(--fg-faint);
+  padding: var(--sp-2) 0;
+}
+.log summary::-webkit-details-marker { display: none; }
+.log summary::before { content: '▸ '; }
+.log[open] summary::before { content: '▾ '; }
+.log summary:hover { color: var(--fg-muted); }
+.log__list {
+  list-style: none; margin: 0; padding: var(--sp-2) 0 0;
+  max-height: 168px; overflow-y: auto;
+  border-top: 1px solid var(--ink-600);
+}
+.log__row {
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: var(--sp-3); align-items: baseline;
+  padding: var(--sp-2) 0;
+  font-size: var(--fs-draft); color: var(--fg-muted);
+}
+.log__row span:nth-child(2) { text-align: right; }
+
+/* ------------------------------------------------------------
+   part shelf
+   ------------------------------------------------------------ */
+.shop { margin-top: var(--sp-3); }
+.shop .shelf__head { margin-bottom: var(--sp-4); }
+.shelf__count b { color: var(--coin); font-weight: 700; }
+
+.cards {
+  display: grid; gap: var(--sp-3);
+  grid-template-columns: repeat(auto-fill, minmax(154px, 1fr));
+}
+
+.card {
+  position: relative; overflow: hidden;
+  display: grid; justify-items: start; gap: 2px;
+  padding: var(--sp-3);
+  border: 1px solid var(--ink-600);
+  border-radius: var(--r-md);
+  background: var(--slot);
+  box-shadow: var(--sunk);
+  cursor: pointer; text-align: left;
+  transition: transform var(--t-fast) var(--ease),
+              border-color var(--t-fast) var(--ease);
+}
+.card[data-state="ok"]:hover { border-color: var(--coin-dim); transform: translateY(-2px); }
+.card[data-state="ok"]:active { transform: translateY(1px); }
+.card[disabled] { cursor: default; }
+.card[data-state="no_coins"] { opacity: .62; }
+
+/* owned -> the card stops being a drawing and becomes a thing */
+.card[data-state="sold_out"] {
+  background: linear-gradient(180deg, #241f1a, #17130f);
+  border-color: var(--real-edge);
+  box-shadow: 0 1px 0 rgba(255,255,255,.05) inset;
+}
+
+.card__icon {
+  width: 100%; height: 54px;
+  display: grid; place-items: center;
+  margin-bottom: var(--sp-2);
+}
+.card__icon svg { width: 100%; height: 100%; }
+.part-icon .unit { opacity: .78; }
+
+.card__qty {
+  position: absolute; top: var(--sp-2); right: var(--sp-2);
+  font-size: var(--fs-draft); color: var(--bp-dim);
+  padding: 1px 5px; border-radius: 3px; background: rgba(0,0,0,.35);
+}
+.card__qty[data-full="true"] { color: var(--real-panel-2); }
+
+.card__name {
+  font-size: var(--fs-sm); font-weight: 600; line-height: 1.35;
+  color: var(--fg);
+}
+.card__price { margin-top: var(--sp-2); font-weight: 600; }
+.card__won   { font-size: var(--fs-draft); color: var(--fg-faint); }
+.card__short { font-size: var(--fs-draft); color: var(--bp-dim); }
+.card__done  { font-size: var(--fs-draft); color: var(--real-panel-2); letter-spacing: .08em; }
+
+/* the "확보" overprint on a finished part — sits clear of the count badge */
+.card__stamp {
+  position: absolute; top: 34px; right: -24px;
+  transform: rotate(-9deg);
+  padding: 3px 28px;
+  font-size: var(--fs-sm); font-weight: 700; letter-spacing: var(--ls-draft);
+  color: var(--real-lamp);
+  border: 2px solid var(--real-lamp);
+  border-radius: 2px;
+  opacity: .5;
+}
+
+/* ------------------------------------------------------------
+   purchase sheet
+   ------------------------------------------------------------ */
+.sheet--buy { text-align: left; }
+.buy__art {
+  height: 132px; margin-bottom: var(--sp-4);
+  display: grid; place-items: center;
+  background: var(--ink-850); border-radius: var(--r-md);
+  box-shadow: var(--sunk);
+}
+.buy__art svg { width: 72%; height: 88%; }
+.buy__price {
+  display: flex; align-items: baseline; gap: var(--sp-3);
+  margin: var(--sp-4) 0 var(--sp-2);
+  font-size: var(--fs-num); font-weight: 700;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+}
+.buy__won { font-size: var(--fs-sm); font-weight: 400; color: var(--fg-muted); }
+.buy__left { margin: 0; font-size: var(--fs-sm); color: var(--fg-muted); }
+.buy__left b { color: var(--coin); }
+
+/* ------------------------------------------------------------
+   footer
+   ------------------------------------------------------------ */
+.foot {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-3); margin-top: var(--sp-5);
+}
+.foot__goal { font-size: var(--fs-draft); color: var(--fg-faint); }
 
 /* ------------------------------------------------------------
    mobile
@@ -378,6 +528,12 @@ button, input, select { font: inherit; color: inherit; }
   .item__mark { width: 56px; height: 28px; }
   .item__mark svg { width: 48px; }
   .sheet { padding-left: var(--sp-4); padding-right: var(--sp-4); }
+  .counterrow { grid-template-columns: 1fr; }
+  .counter { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: var(--sp-3); }
+  .counter .stamp { width: 100%; }
+  .counter__val { margin-top: 0; font-size: 2rem; }
+  .counter__rate { margin-left: auto; padding-top: 0; }
+  .cards { grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); }
 }
 /* ============================================================
    The drawing itself — blueprint vs. real
