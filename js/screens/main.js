@@ -7,10 +7,11 @@
 
 import { renderBlueprint, applyOwnership } from '../ui/blueprint.js';
 import { renderShop, partIcon } from '../ui/shop.js';
-import { renderDeposit, depositAmount } from '../ui/deposit.js';
+import { renderDeposit, extraAmount, adjustedAmount } from '../ui/deposit.js';
 import * as store from '../store.js';
 import {
   progress, formatWon, formatCoin, coinToWon, pricedParts, ownedOf,
+  nextGap, wonToCoin,
 } from '../parts.js';
 
 let svg = null;
@@ -30,7 +31,7 @@ export function renderMain(mount) {
 
       <div class="counterrow">
         <div class="plate plate--riveted counter" id="counter"></div>
-        <div class="plate plate--riveted deposit" id="deposit"></div>
+        <div class="plate plate--riveted saving" id="deposit"></div>
       </div>
 
       <div class="plate plate--riveted shop" id="shop"></div>
@@ -62,7 +63,11 @@ function draw(mount) {
     <div class="counter__won num">${formatWon(coinToWon(s.coins))}원</div>
     <div class="counter__rate">1 코인 = <span class="num">1,000</span>원</div>`;
 
-  renderDeposit(mount.querySelector('#deposit'), s, store.currentDepositStatus());
+  renderDeposit(
+    mount.querySelector('#deposit'),
+    s,
+    store.currentPaydayStatus(),
+    nextGap(s.goal.partSetId, s.goal.totalPrice, s.owned, s.coins));
   renderShop(mount.querySelector('#shop'), s);
 
   mount.querySelector('#foot-goal').textContent =
@@ -72,12 +77,22 @@ function draw(mount) {
 function onClick(e) {
   const mount = e.currentTarget;
 
-  if (e.target.closest('#dep-go')) {
-    const won = depositAmount(mount.querySelector('#deposit'));
-    if (won > 0) store.certify(won);
+  const dep = mount.querySelector('#deposit');
+
+  if (e.target.closest('#collect')) {
+    store.collectAuto(adjustedAmount(dep));
     draw(mount);
     return;
   }
+
+  if (e.target.closest('#extra-go')) {
+    const won = extraAmount(dep);
+    if (won > 0) store.addExtra(won);
+    draw(mount);
+    return;
+  }
+
+  if (e.target.closest('#plan-edit')) { askPlan(mount); return; }
 
   const buy = e.target.closest('[data-buy]');
   if (buy && !buy.disabled) { askBuy(mount, buy.dataset.buy); return; }
@@ -87,7 +102,7 @@ function onClick(e) {
 
 /* ---- a sheet that asks one question ---- */
 
-function openSheet(bodyHtml, confirmLabel, onConfirm) {
+function openSheet(bodyHtml, confirmLabel, onConfirm, onReady) {
   const scrim = document.createElement('div');
   scrim.className = 'scrim';
   scrim.innerHTML = `
@@ -106,11 +121,55 @@ function openSheet(bodyHtml, confirmLabel, onConfirm) {
   document.addEventListener('keydown', esc);
   scrim.addEventListener('click', (ev) => {
     if (ev.target === scrim || ev.target.closest('[data-cancel]')) { close(); return; }
-    if (ev.target.closest('[data-confirm]')) { close(); onConfirm(); }
+    if (ev.target.closest('[data-confirm]')) {
+      const sheet = scrim.querySelector('.sheet');
+      onConfirm(sheet);
+      close();
+    }
   });
 
+  if (onReady) onReady(scrim.querySelector('.sheet'));
   requestAnimationFrame(() => scrim.querySelector('.sheet').classList.add('is-in'));
   scrim.querySelector('[data-confirm]').focus();
+}
+
+function askPlan(mount) {
+  const g = store.getState().goal;
+  openSheet(`
+    <h2 class="sheet__name" id="sheet-q">정기 저금</h2>
+    <p class="sheet__note">월급날마다 이 금액이 자동으로 들어옵니다.</p>
+    <div class="rows">
+      <div>
+        <div class="row__head">
+          <span class="stamp">매달 저금할 금액</span>
+          <span class="row__sub coin-amt"><i class="coin"></i><span class="num" id="plan-coin">${formatCoin(wonToCoin(g.monthlyDeposit))}</span> 코인</span>
+        </div>
+        <div class="field field--num">
+          <input id="plan-amt" type="text" inputmode="numeric" value="${formatWon(g.monthlyDeposit)}">
+          <span class="field__unit">원</span>
+        </div>
+      </div>
+      <div>
+        <div class="row__head"><span class="stamp">월급날</span></div>
+        <div class="field field--num">
+          <input id="plan-day" type="text" inputmode="numeric" value="${g.payday}">
+          <span class="field__unit">일</span>
+        </div>
+      </div>
+    </div>`, '이렇게 바꾸기', (sheet) => {
+      store.updatePlan({
+        monthlyDeposit: Number(sheet.querySelector('#plan-amt').value.replace(/[^\d]/g, '')) || 0,
+        payday: Number(sheet.querySelector('#plan-day').value.replace(/[^\d]/g, '')) || g.payday,
+      });
+      draw(mount);
+    }, (sheet) => {
+      const amt = sheet.querySelector('#plan-amt');
+      amt.addEventListener('input', () => {
+        const n = Number(amt.value.replace(/[^\d]/g, '')) || 0;
+        amt.value = n ? formatWon(n) : '';
+        sheet.querySelector('#plan-coin').textContent = formatCoin(wonToCoin(n));
+      });
+    });
 }
 
 function askStartOver() {

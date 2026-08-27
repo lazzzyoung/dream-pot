@@ -6,7 +6,7 @@
 
 import {
   formatWon, formatCoin, wonToCoin, monthsToComplete, formatMonths,
-  completionDate, todayISO, parseDate, affordableCount, cheapestPart,
+  completionDate, todayISO, parseDate, affordableCount, cheapestPart, nthPayday, formatDate,
 } from '../parts.js';
 import { createGoal } from '../store.js';
 import { MODEL3_SVG } from '../../svg/model3.js';
@@ -32,6 +32,7 @@ export function openConfirm(item) {
     price: item.basePrice,
     monthly: DEFAULT_MONTHLY,
     start: todayISO(),
+    payday: parseDate(todayISO()).getDate(),
     setId: item.partSetId || 'model3',
   };
 
@@ -56,7 +57,7 @@ export function openConfirm(item) {
 
         <div>
           <div class="row__head">
-            <span class="stamp">매달 저축할 금액</span>
+            <span class="stamp">월급날 자동으로 저금할 금액</span>
             <span class="row__sub coin-amt"><i class="coin"></i><span class="num" id="v-monthly-coin"></span> 코인</span>
           </div>
           <div class="field field--num">
@@ -66,9 +67,13 @@ export function openConfirm(item) {
         </div>
 
         <div>
-          <div class="row__head"><span class="stamp">시작일</span></div>
-          <div class="field">
-            <input id="f-start" type="date">
+          <div class="row__head">
+            <span class="stamp">월급날</span>
+            <span class="row__sub" id="v-firstpay"></span>
+          </div>
+          <div class="field field--num">
+            <input id="f-payday" type="text" inputmode="numeric">
+            <span class="field__unit">일</span>
           </div>
         </div>
       </div>
@@ -86,18 +91,21 @@ export function openConfirm(item) {
     </div>`;
 
   const $ = (s) => root.querySelector(s);
-  const price = $('#f-price'), monthly = $('#f-monthly'), start = $('#f-start');
+  const price = $('#f-price'), monthly = $('#f-monthly'), payday = $('#f-payday');
   price.value = formatWon(state.price);
   monthly.value = formatWon(state.monthly);
-  start.value = state.start;
+  payday.value = String(state.payday);
 
   function sync() {
     state.price = digits(price.value);
     state.monthly = digits(monthly.value);
-    state.start = start.value || todayISO();
+    state.payday = Math.min(31, Math.max(1, digits(payday.value) || 1));
 
     $('#v-price-coin').textContent = formatCoin(wonToCoin(state.price));
     $('#v-monthly-coin').textContent = formatCoin(wonToCoin(state.monthly));
+
+    const first = nthPayday({ startDate: state.start, payday: state.payday }, 0);
+    $('#v-firstpay').textContent = `첫 저금 ${first.getMonth() + 1}월 ${first.getDate()}일`;
 
     const months = monthsToComplete(state.price, state.monthly);
     $('#v-months').textContent = formatMonths(months);
@@ -130,13 +138,17 @@ export function openConfirm(item) {
     el.value = n ? formatWon(n) : '';
     sync();
   }));
-  start.addEventListener('change', sync);
+  payday.addEventListener('input', () => {
+    payday.value = payday.value.replace(/[^\d]/g, '').slice(0, 2);
+    sync();
+  });
 
   $('[data-close]').addEventListener('click', closeConfirm);
   $('[data-go]').addEventListener('click', () => {
     createGoal({
       id: item.id, name: item.name, totalPrice: state.price,
-      partSetId: state.setId, monthlyDeposit: state.monthly, startDate: state.start,
+      partSetId: state.setId, monthlyDeposit: state.monthly,
+      payday: state.payday, startDate: state.start,
     });
     closeConfirm();
     onDone();

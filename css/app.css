@@ -384,13 +384,58 @@ button, input, select { font: inherit; color: inherit; }
   font-size: var(--fs-draft); color: var(--fg-faint); letter-spacing: .06em;
 }
 
-.deposit__ask  { margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-lg); }
-.deposit__ask b { font-weight: 700; }
-.deposit__wait { margin: var(--sp-2) 0 2px; font-size: var(--fs-lg); }
-.deposit__wait b { color: var(--coin); font-weight: 700; }
-.deposit__sub  { margin: 0 0 var(--sp-3); font-size: var(--fs-sm); color: var(--fg-muted); }
-.deposit .field { margin-bottom: var(--sp-3); }
-.deposit .key--wide { margin-top: 0; }
+/* ---- saving card: two lanes ---- */
+.saving { display: flex; flex-direction: column; }
+.lanes { display: grid; gap: var(--sp-4); }
+
+.lane { display: grid; gap: var(--sp-2); align-content: start; }
+.lane + .lane { padding-top: var(--sp-4); border-top: 1px solid var(--ink-600); }
+.lane__line { margin: var(--sp-1) 0 0; font-size: var(--fs-base); line-height: 1.5; }
+.lane__line b { font-weight: 700; color: var(--fg); }
+.lane__sub { margin: 0; font-size: var(--fs-sm); color: var(--fg-muted); }
+.lane .coin-amt { font-weight: 600; }
+
+/* payday has landed — the one thing on this card that gets to glow */
+.lane--ready .lane__line b { color: var(--coin); }
+.lane--ready .stamp { color: var(--coin); }
+.lane--ready .key--wide { margin-top: var(--sp-2); }
+
+.linkbtn {
+  justify-self: start;
+  background: none; border: 0; padding: var(--sp-1) 0;
+  font-size: var(--fs-draft); letter-spacing: .06em;
+  color: var(--fg-faint); cursor: pointer;
+  border-bottom: 1px solid var(--ink-500);
+}
+.linkbtn:hover { color: var(--fg-muted); border-bottom-color: var(--bp-line-soft); }
+
+.adjust { margin-top: var(--sp-2); }
+
+/* the gap chip: "도어까지 240코인 — 240,000원 넣기" */
+.chip {
+  display: flex; align-items: baseline; gap: var(--sp-2); flex-wrap: wrap;
+  width: 100%; text-align: left; cursor: pointer;
+  margin-top: var(--sp-1);
+  padding: var(--sp-3);
+  border: 1px dashed var(--coin-dim);
+  border-radius: var(--r-md);
+  background: rgba(242,193,78,.05);
+}
+.chip:hover { background: rgba(242,193,78,.1); border-color: var(--coin); }
+.chip:active { transform: translateY(1px); }
+.chip__lead { font-size: var(--fs-sm); color: var(--fg-muted); }
+.chip__main { font-size: var(--fs-lg); font-weight: 700; }
+.chip__sub  { margin-left: auto; font-size: var(--fs-draft); color: var(--fg-faint); }
+
+.extra__row { display: flex; gap: var(--sp-2); align-items: stretch; }
+.extra__row .field { flex: 1 1 auto; min-width: 0; }
+.extra__row .key { flex: none; padding-left: var(--sp-4); padding-right: var(--sp-4); }
+
+.log__kind {
+  font-size: var(--fs-draft); letter-spacing: .06em;
+  padding: 0 5px; border-radius: 3px;
+  background: rgba(116,170,178,.12); color: var(--bp-text);
+}
 
 .log { margin-top: var(--sp-3); }
 .log summary {
@@ -408,12 +453,12 @@ button, input, select { font: inherit; color: inherit; }
   border-top: 1px solid var(--ink-600);
 }
 .log__row {
-  display: grid; grid-template-columns: auto 1fr auto;
-  gap: var(--sp-3); align-items: baseline;
+  display: grid; grid-template-columns: auto auto 1fr auto;
+  gap: var(--sp-2) var(--sp-3); align-items: baseline;
   padding: var(--sp-2) 0;
   font-size: var(--fs-draft); color: var(--fg-muted);
 }
-.log__row span:nth-child(2) { text-align: right; }
+.log__row span:nth-child(3) { text-align: right; }
 
 /* ------------------------------------------------------------
    part shelf
@@ -534,6 +579,7 @@ button, input, select { font: inherit; color: inherit; }
   .counter__val { margin-top: 0; font-size: 2rem; }
   .counter__rate { margin-left: auto; padding-top: 0; }
   .cards { grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); }
+  .chip__sub { margin-left: 0; width: 100%; }
 }
 /* ============================================================
    The drawing itself — blueprint vs. real

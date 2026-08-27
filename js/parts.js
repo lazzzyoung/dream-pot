@@ -167,28 +167,57 @@ export function todayISO(now = new Date()) {
 }
 
 /* ============================================================
-   deposits — the certification schedule (PRD 6.4)
+   saving — two lanes.
+   AUTO  : a fixed amount that lands every payday. The user sets it once.
+   EXTRA : any amount, any time. This is what closes a 5-coin gap so nobody
+           waits a month over pocket change.
    ============================================================ */
 
-/**
- * Where the user stands against the monthly schedule.
- * Due dates are startDate, +1 month, +2 months … one per deposit made.
- * Several missed months each get their own certification.
- */
-export function depositStatus(goal, depositCount, now = new Date()) {
-  const start = parseDate(goal.startDate);
-  const nextDate = addMonths(start, depositCount);
-  const days = daysUntil(now, nextDate);
+/** The `day`-th of a month, pulled back to the last day when short. */
+export function dayInMonth(year, month, day) {
+  const last = new Date(year, month + 1, 0).getDate();
+  return new Date(year, month, Math.min(day, last));
+}
 
+/** The n-th payday of this goal (0 = the first one on or after the start). */
+export function nthPayday(goal, n) {
+  const start = parseDate(goal.startDate);
+  const day = goal.payday || start.getDate();
+  let month = start.getMonth();
+  if (dayInMonth(start.getFullYear(), month, day) < start) month += 1;
+  return dayInMonth(start.getFullYear(), month + n, day);
+}
+
+/**
+ * Where the auto lane stands. `collected` is how many paydays have already
+ * been paid out. Missed paydays stack up and are collected together.
+ */
+export function paydayStatus(goal, collected, now = new Date()) {
+  const next = nthPayday(goal, collected);
   let due = 0;
-  while (due < 600 && daysUntil(now, addMonths(start, depositCount + due)) <= 0) due++;
+  while (due < 600 && daysUntil(now, nthPayday(goal, collected + due)) <= 0) due++;
 
   return {
-    nextDate: formatDate(nextDate),
-    daysUntil: days,        // <= 0 means it is already due
-    due,                    // how many months are certifiable right now
-    canCertify: due > 0,
+    nextDate: formatDate(next),
+    daysUntil: daysUntil(now, next),   // <= 0 means it has already landed
+    due,                                // paydays waiting to be collected
+    ready: due > 0,
+    coins: due * wonToCoin(goal.monthlyDeposit),
+    won: due * goal.monthlyDeposit,
   };
+}
+
+/**
+ * The cheapest part still out of reach, and the gap to it.
+ * This is what the extra-saving field offers to fill in one tap.
+ */
+export function nextGap(setId, totalPrice, owned, coins) {
+  const wanted = pricedParts(setId, totalPrice)
+    .filter((p) => ownedOf(owned, p.id) < p.count && p.unitCoin > coins)
+    .sort((a, b) => a.unitCoin - b.unitCoin)[0];
+  if (!wanted) return null;
+  const short = wanted.unitCoin - coins;
+  return { part: wanted, coins: short, won: coinToWon(short) };
 }
 
 /* ============================================================
